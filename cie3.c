@@ -1,3 +1,4 @@
+//Modify the program to find the largest prime number less than n 
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -26,7 +27,7 @@ int main() {
     int largest_prime_seq = -1;
     double start_time = omp_get_wtime();
     
-    
+    // Sequential search
     for (int i = n - 1; i >= 2; i--) {
         if (is_prime(i)) {
             largest_prime_seq = i;
@@ -37,7 +38,7 @@ int main() {
     double time_seq = omp_get_wtime() - start_time;
     printf("Sequential: Largest prime < %d is %d (Time: %f seconds)\n", n, largest_prime_seq, time_seq);
 
-
+    // Parallel search
     int largest_prime_par = -1;
     start_time = omp_get_wtime();
 
