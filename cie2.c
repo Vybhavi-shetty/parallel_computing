@@ -1,23 +1,28 @@
+#include <mpi.h>
 #include <stdio.h>
-#include <omp.h>
 
-int main() {
-    int thread_id, team_size;
+int main(int argc, char* argv[]) {
+    int rank, size;
+    int number;
 
-    // Disable dynamic adjustment of threads
-    omp_set_dynamic(0);
+    MPI_Init(&argc, &argv);                 
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);  
+    MPI_Comm_size(MPI_COMM_WORLD, &size);   
 
-    // Set number of threads to 4
-    omp_set_num_threads(4);
-
-    // Launch parallel region
-    #pragma omp parallel
-    {
-        thread_id = omp_get_thread_num();
-        team_size = omp_get_num_threads();
-
-        printf("Thread id = %d , team size = %d\n", thread_id, team_size);
+    if (size < 2) {
+        printf("This program requires at least 2 processes.\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    return 0;
+    if (rank == 0) {
+        number = 5; 
+        MPI_Send(&number, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+        MPI_Recv(&number, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("Process 1 received %d\n", number);
+        printf("Process 1 multiplied value = %d\n", number * 2);
+    }
+
+    MPI_Finalize();
+    return 0;
 }
